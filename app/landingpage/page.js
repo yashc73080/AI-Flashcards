@@ -1,7 +1,7 @@
 'use client';
 
-import { AppBar, Toolbar, Typography, Button, Box, Grid } from '@mui/material';
 import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
+import { AppBar, Box, Button, Grid, Toolbar, Typography } from '@mui/material';
 import { loadStripe } from '@stripe/stripe-js';
 
 const LandingPage = () => {
@@ -55,7 +55,7 @@ const LandingPage = () => {
                 </Button>
             </Box>
 
-            <Box sx={{my: 6}}>
+            <Box sx={{my: 6, textAlign: 'center'}}>
                 <Typography variant="h4" component="h2" gutterBottom>Features</Typography>
                 <Grid container spacing={4}>
                     {/* Feature items */}
