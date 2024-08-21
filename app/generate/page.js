@@ -104,7 +104,7 @@ const GeneratePage = () => {
                     }}
                     InputProps={{
                         style: {
-                            color: 'white',
+                            color: 'black',
                         },
                     }}
                 />
