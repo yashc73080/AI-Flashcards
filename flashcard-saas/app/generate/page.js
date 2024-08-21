@@ -3,9 +3,15 @@
 import { useState } from 'react';
 import { Container, TextField, Button, Typography, Box, Grid, Card, CardContent, Dialog, DialogContent, DialogTitle, 
     DialogContentText, DialogActions, } from '@mui/material';
+import { doc, setDoc, getDoc, writeBatch, collection } from 'firebase/firestore';
+import { getAuth, signInWithCustomToken } from 'firebase/auth'
+import { db, auth } from '../../firebase';
+import { useUser, useAuth } from "@clerk/nextjs";
 
 const GeneratePage = () => {
 
+    const { user } = useUser();
+    const { userId, getToken } = useAuth();
     const [text, setText] = useState('')
     const [flashcards, setFlashcards] = useState([])
     const [setName, setSetName] = useState('')
@@ -39,39 +45,78 @@ const GeneratePage = () => {
     const handleOpenDialog = () => setDialogOpen(true)
     const handleCloseDialog = () => setDialogOpen(false)
 
+    // const saveFlashcards = async () => {
+    //     if (!setName.trim()) {
+    //       alert('Please enter a name for your flashcard set.')
+    //       return
+    //     }
+      
+    //     try {
+    //         const userDocRef = doc(collection(db, 'users'), user.id)
+    //         const userDocSnap = await getDoc(userDocRef)
+    //         const setDocRef = doc(collection(userDocRef, "flashcardSets"), setName);
+      
+    //     //   const batch = writeBatch(db)
+      
+    //       if (userDocSnap.exists()) {
+    //         const userData = userDocSnap.data()
+    //         const updatedSets = [...(userData.flashcardSets || []), { name: setName }]
+    //         await setDoc(userDocRef, { flashcardSets: updatedSets }, { merge: true });
+    //         // batch.update(userDocRef, { flashcardSets: updatedSets })
+    //       } else {
+    //         // batch.set(userDocRef, { flashcardSets: [{ name: setName }] })
+    //         await setDoc(userDocRef, { flashcardSets: [{ name: setName }] });
+    //       }
+
+    //       await setDoc(setDocRef, { flashcards });
+      
+    //     //   batch.set(setDocRef, { flashcards })
+      
+    //     //   await batch.commit()
+      
+    //       alert('Flashcards saved successfully!')
+    //       handleCloseDialog()
+    //       setSetName('')
+    //     } 
+    //     catch (error) {
+    //       console.error('Error saving flashcards:', error)
+    //       alert('An error occurred while saving flashcards. Please try again.')
+    //     }
+    // }
+
     const saveFlashcards = async () => {
         if (!setName.trim()) {
-          alert('Please enter a name for your flashcard set.')
-          return
+          alert("Please enter a name for your flashcard set.");
+          return;
         }
       
         try {
-          const userDocRef = doc(collection(db, 'users'), user.id)
-          const userDocSnap = await getDoc(userDocRef)
+          const token = await getToken({ template: "integration_firebase" });
+          const userCredentials = await signInWithCustomToken(auth, token || "");
       
-          const batch = writeBatch(db)
+          const userDocRef = doc(collection(db, "users"), userId);
+          const userDocSnap = await getDoc(userDocRef);
       
           if (userDocSnap.exists()) {
-            const userData = userDocSnap.data()
-            const updatedSets = [...(userData.flashcardSets || []), { name: setName }]
-            batch.update(userDocRef, { flashcardSets: updatedSets })
+            const userData = userDocSnap.data();
+            const updatedSets = [...(userData.flashcardSets || []), { name: setName }];
+            await setDoc(userDocRef, { flashcardSets: updatedSets }, { merge: true });
           } else {
-            batch.set(userDocRef, { flashcardSets: [{ name: setName }] })
+            await setDoc(userDocRef, { flashcardSets: [{ name: setName }] });
           }
       
-          const setDocRef = doc(collection(userDocRef, 'flashcardSets'), setName)
-          batch.set(setDocRef, { flashcards })
+          const setDocRef = doc(collection(userDocRef, "flashcardSets"), setName);
+          await setDoc(setDocRef, { flashcards });
       
-          await batch.commit()
-      
-          alert('Flashcards saved successfully!')
-          handleCloseDialog()
-          setSetName('')
-        } catch (error) {
-          console.error('Error saving flashcards:', error)
-          alert('An error occurred while saving flashcards. Please try again.')
+          alert("Flashcards saved successfully!");
+          handleCloseDialog();
+          setSetName("");
+        } 
+        catch (error) {
+          console.error("Error saving flashcards:", error);
+          alert("An error occurred while saving flashcards. Please try again.");
         }
-      }
+      };
       
 
     return (
@@ -141,7 +186,7 @@ const GeneratePage = () => {
                 )}
 
             {flashcards.length > 0 && (
-                <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+                <Box sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center' }}>
                     <Button variant="contained" color="primary" onClick={handleOpenDialog}>
                         Save Flashcards
                     </Button>
@@ -166,7 +211,7 @@ const GeneratePage = () => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseDialog}>Cancel</Button>
-                    <Button onClick={saveFlashcards} color="primary">
+                    <Button onClick={() => saveFlashcards(user)} color="primary">
                         Save
                     </Button>
                 </DialogActions>

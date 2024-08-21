@@ -35,10 +35,7 @@ const LandingPage = () => {
                     <Box>
                         <SignedOut>
                             <Button color="inherit" href="/sign-in">
-                                Login
-                            </Button>
-                            <Button color="inherit" href="/sign-up">
-                                Sign Up
+                                Sign In
                             </Button>
                         </SignedOut>
                         <SignedIn>

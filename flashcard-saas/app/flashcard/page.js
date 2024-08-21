@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useSearchParams } from 'next/navigation';
 import { collection, getDocs } from 'firebase/firestore';
-import db from '../../firebase';
+import { db } from '../../firebase';
 import { Container, Grid, Card, CardActionArea, CardContent, Typography, Box } from '@mui/material';
 
 const FlashcardPage = () => {
