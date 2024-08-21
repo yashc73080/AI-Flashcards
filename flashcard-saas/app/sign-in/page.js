@@ -29,7 +29,7 @@ const SignInPage = () => {
         <Typography variant="h4" component="h1" gutterBottom>
           Sign In
         </Typography>
-        <SignIn />
+        <SignIn routing="hash" />
       </Box>
     </Box>
   )
