@@ -221,7 +221,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Container, TextField, Button, Typography, Box, Grid, Card, CardContent, Dialog, DialogContent, DialogTitle, 
-    DialogContentText, DialogActions, } from '@mui/material';
+    DialogContentText, DialogActions, IconButton, } from '@mui/material';
+import HomeIcon from '@mui/icons-material/Home';
 import { doc, setDoc, getDoc, collection } from 'firebase/firestore';
 import { getAuth, signInWithCustomToken } from 'firebase/auth';
 import { db, auth } from '../../firebase';
@@ -360,12 +361,21 @@ const GeneratePage = () => {
         router.push('/flashcards');
     };
 
+    const handleGoHome = () => {
+        router.push('/landingpage');
+    };
+
     return (
         <Container maxWidth="md">
             <Box sx={{ my: 4 }}>
-                <Typography variant="h4" component="h1" gutterBottom>
-                    Generate Flashcards
-                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h4" component="h1">
+                        Generate Flashcards
+                    </Typography>
+                    <IconButton color="primary" onClick={handleGoHome}>
+                        <HomeIcon />
+                    </IconButton>
+                </Box>
                 <TextField
                     value={text}
                     onChange={(e) => setText(e.target.value)}

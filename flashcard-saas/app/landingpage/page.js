@@ -55,7 +55,17 @@ const LandingPage = () => {
                     <Button variant="contained" color="primary" sx={{mt: 2, mr: 2}} href="/generate">
                     Get Started
                 </Button>
-                <Button variant="outlined" color="primary" sx={{mt: 2}}>
+                <Button 
+                    variant="outlined" 
+                    color="primary" 
+                    sx={{mt: 2}}
+                    onClick={() => {
+                        const pricingSection = document.getElementById('pricing-section');
+                        if (pricingSection) {
+                            pricingSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }}
+                >
                     Learn More
                 </Button>
             </Box>
@@ -90,7 +100,7 @@ const LandingPage = () => {
                 </Grid>
             </Box>
 
-            <Box sx={{ my: 6, textAlign: 'center' }}>
+            <Box id="pricing-section" sx={{ my: 6, textAlign: 'center' }}>
                 <Typography variant="h4" component="h2" gutterBottom>
                     Pricing
                 </Typography>

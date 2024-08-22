@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useRouter } from 'next/navigation';
-import { Container, Grid, Card, CardActionArea, CardContent, Typography, Box } from '@mui/material';
+import { Container, Grid, Card, CardActionArea, CardContent, Typography, Box, Button } from '@mui/material';
 import { doc, getDoc, collection } from 'firebase/firestore';
 import { db } from '../../firebase';
 
@@ -45,12 +45,24 @@ const FlashcardsPage = () => {
       router.push(`/flashcard?set=${encodeURIComponent(JSON.stringify(set))}`);
     };
 
+    const handleGeneratePageClick = () => {
+      router.push('/generate');
+    };
+
       return (
         <Container maxWidth="md">
           <Box sx={{ my: 4 }}>
           <Typography variant="h4" component="h1" gutterBottom>
             Your Saved Flashcard Sets
           </Typography>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={handleGeneratePageClick}
+            sx={{ mb: 4 }}
+          >
+            Go to Generate Page
+          </Button>
           <Grid container spacing={3} sx={{ mt: 4 }}>
             {flashcardSets.map((set, index) => (
               <Grid item xs={12} sm={6} md={4} key={index}>
