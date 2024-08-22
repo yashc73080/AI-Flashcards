@@ -1,42 +1,64 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
-import { Container, Grid, Card, CardActionArea, CardContent, Typography } from '@mui/material';
+import { useRouter } from 'next/navigation';
+import { Container, Grid, Card, CardActionArea, CardContent, Typography, Box } from '@mui/material';
+import { doc, getDoc, collection } from 'firebase/firestore';
+import { db } from '../../firebase';
 
 const FlashcardsPage = () => {
 
     const { isLoaded, isSignedIn, user } = useUser();
-    const [flashcards, setFlashcards] = useState([]);
+    const [flashcardSets, setFlashcardSets] = useState([]);
+    const [currentFlashcards, setCurrentFlashcards] = useState([]);
     const router = useRouter();
 
     useEffect(() => {
-        async function getFlashcards() {
-          if (!user) return
-          const docRef = doc(collection(db, 'users'), user.id)
-          const docSnap = await getDoc(docRef)
-          if (docSnap.exists()) {
-            const collections = docSnap.data().flashcards || []
-            setFlashcards(collections)
-          } else {
-            await setDoc(docRef, { flashcards: [] })
-          }
+      async function getFlashcardSets() {
+        if (!user) return;
+        const docRef = doc(collection(db, 'users'), user.id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const sets = docSnap.data().flashcardSets || [];
+          setFlashcardSets(sets);
+        } else {
+          await setDoc(docRef, { flashcardSets: [] });
         }
-        getFlashcards()
-      }, [user])
-
-      const handleCardClick = (id) => {
-        router.push(`/flashcard?id=${id}`)
       }
+      getFlashcardSets();
+    }, [user]);
+
+    // const handleCardClick = async (set) => {
+    //   const docRef = doc(collection(doc(collection(db, 'users'), user.id), 'flashcardSets'), set);
+    //   const docSnap = await getDoc(docRef);
+    //   if (docSnap.exists()) {
+    //     setCurrentFlashcards(docSnap.data().flashcards);
+    //   } else {
+    //     setCurrentFlashcards([]);
+    //   }
+    //   router.push(`/flashcard?set=${encodeURIComponent(JSON.stringify(set))}`);
+    //   console.log('Successfully clicked on: ', set, 'with name: ', set.name);
+    // };
+
+    const handleCardClick = (set) => {
+      router.push(`/flashcard?set=${encodeURIComponent(JSON.stringify(set))}`);
+    };
 
       return (
         <Container maxWidth="md">
+          <Box sx={{ my: 4 }}>
+          <Typography variant="h4" component="h1" gutterBottom>
+            Your Saved Flashcard Sets
+          </Typography>
           <Grid container spacing={3} sx={{ mt: 4 }}>
-            {flashcards.map((flashcard, index) => (
+            {flashcardSets.map((set, index) => (
               <Grid item xs={12} sm={6} md={4} key={index}>
                 <Card>
-                  <CardActionArea onClick={() => handleCardClick(flashcard.name)}>
+                  <CardActionArea onClick={() => handleCardClick(set.name)}>
                     <CardContent>
                       <Typography variant="h5" component="div">
-                        {flashcard.name}
+                        {set.name}
                       </Typography>
                     </CardContent>
                   </CardActionArea>
@@ -44,8 +66,11 @@ const FlashcardsPage = () => {
               </Grid>
             ))}
           </Grid>
+          </Box>
         </Container>
       );
 };
+
+// TODO Make it possible to change how many cards are generated and then display that number on this page
 
 export default FlashcardsPage;

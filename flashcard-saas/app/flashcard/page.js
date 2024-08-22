@@ -1,7 +1,9 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useSearchParams } from 'next/navigation';
-import { collection, getDocs } from 'firebase/firestore';
+import { doc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { Container, Grid, Card, CardActionArea, CardContent, Typography, Box } from '@mui/material';
 
@@ -11,28 +13,42 @@ const FlashcardPage = () => {
     const [flipped, setFlipped] = useState({});
 
     const searchParams = useSearchParams();
-    const search = searchParams.get('id');
+    const setParam = searchParams.get('set');
+    const [set, setSet] = useState(null);
 
     useEffect(() => {
-        async function getFlashcard() {
-          if (!search || !user) return
-      
-          const colRef = collection(doc(collection(db, 'users'), user.id), search)
-          const docs = await getDocs(colRef)
-          const flashcards = []
-          docs.forEach((doc) => {
-            flashcards.push({ id: doc.id, ...doc.data() })
-          })
-          setFlashcards(flashcards)
+      if (setParam) {
+        try {
+          const parsedSet = JSON.parse(decodeURIComponent(setParam));
+          setSet(parsedSet);
+        } catch (error) {
+          console.error('Error parsing set from URL:', error);
         }
-        getFlashcard()
-      }, [search, user]);
+      }
+    }, [setParam]);
+  
+
+    useEffect(() => {
+      async function getFlashcards() {
+        if (!set || !user) return;
+  
+        const docRef = doc(collection(db, 'users', user.id, 'flashcardSets', set.name));
+        const docSnap = await getDoc(docRef);
+  
+        if (docSnap.exists()) {
+          setFlashcards(docSnap.data().flashcards);
+        } else {
+          setFlashcards([]);
+        }
+      }
+      getFlashcards();
+    }, [set, user]);
 
     const handleCardClick = (id) => {
-        setFlipped((prev) => ({
-            ...prev,
-            [id]: !prev[id],
-        }))
+      setFlipped((prev) => ({
+        ...prev,
+        [id]: !prev[id],
+      }));
     };
 
     return (
@@ -43,7 +59,7 @@ const FlashcardPage = () => {
                 <Card>
                   <CardActionArea onClick={() => handleCardClick(flashcard.id)}>
                     <CardContent>
-                      <Box sx={{ /* Styling for flip animation */ }}>
+                      <Box sx={{ /* Styling for flip animation */ }}> 
                         <div>
                           <div>
                             <Typography variant="h5" component="div">
