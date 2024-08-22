@@ -376,10 +376,14 @@ const GeneratePage = () => {
                         <HomeIcon />
                     </IconButton>
                 </Box>
+                <Typography variant="body1" sx={{ mb: 1 }}>
+                    Enter description below:
+                </Typography>
                 <TextField
                     value={text}
                     onChange={(e) => setText(e.target.value)}
-                    label="Enter text"
+                    label="Description"
+                    placeholder="What do you want your flashcards to be about?"
                     fullWidth
                     multiline
                     rows={4}
@@ -411,7 +415,7 @@ const GeneratePage = () => {
                     fullWidth
                     disabled={loading}
                 >
-                    {loading ? 'Generating...' : 'Generate Flashcards'}
+                    {loading ? 'Generating...' : 'Generate AI Flashcards'}
                 </Button>
                 {flashcards.length === 0 && (
                     <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
