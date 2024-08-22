@@ -27,11 +27,11 @@ const FlashcardPage = () => {
       }
     }, [setParam]);
   
-
     useEffect(() => {
       async function getFlashcards() {
         if (!set || !user) return;
   
+        console.log(db);
         const docRef = doc(collection(db, 'users', user.id, 'flashcardSets', set.name));
         const docSnap = await getDoc(docRef);
   
@@ -53,20 +53,58 @@ const FlashcardPage = () => {
 
     return (
         <Container maxWidth="md">
+          <style>
+            {`
+              .flip-card {
+                perspective: 1000px;
+              }
+
+              .flip-card-inner {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                text-align: center;
+                transition: transform 0.6s;
+                transform-style: preserve-3d;
+              }
+
+              .flip-card:hover .flip-card-inner {
+                transform: rotateY(180deg);
+              }
+
+              .flip-card-front, .flip-card-back {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                backface-visibility: hidden;
+              }
+
+              .flip-card-front {
+                background-color: #fff;
+                color: black;
+              }
+
+              .flip-card-back {
+                background-color: #f1f1f1;
+                color: black;
+                transform: rotateY(180deg);
+              }
+            `}
+          </style>
           <Grid container spacing={3} sx={{ mt: 4 }}>
             {flashcards.map((flashcard) => (
               <Grid item xs={12} sm={6} md={4} key={flashcard.id}>
                 <Card>
                   <CardActionArea onClick={() => handleCardClick(flashcard.id)}>
                     <CardContent>
-                      <Box sx={{ /* Styling for flip animation */ }}> 
-                        <div>
-                          <div>
+                      <Box className="flip-card"> 
+                        <div className={`flip-card-inner ${flipped[flashcard.id] ? 'flipped' : ''}`}>
+                          <div className="flip-card-front">
                             <Typography variant="h5" component="div">
                               {flashcard.front}
                             </Typography>
                           </div>
-                          <div>
+                          <div className="flip-card-back">
                             <Typography variant="h5" component="div">
                               {flashcard.back}
                             </Typography>
