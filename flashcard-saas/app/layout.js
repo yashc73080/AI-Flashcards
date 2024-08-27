@@ -5,7 +5,7 @@ import { ClerkProvider, SignInButton, SignedIn, SignedOut, UserButton } from '@c
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "AI Flashcards",
+  title: "Cardify: AI Flashcards",
   description: "App to create flashcards from your text",
 };
 
